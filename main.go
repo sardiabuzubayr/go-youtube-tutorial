@@ -2,31 +2,31 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"os"
 
-	"github.com/go-co-op/gocron"
+	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 func main() {
-	local, err := time.LoadLocation("Asia/Jakarta")
+	err := godotenv.Load(".env.local")
+
 	if err != nil {
-		local = time.UTC
+		fmt.Println("Gagal load file env")
 	}
 
-	s := gocron.NewScheduler(local)
-	s.Every(1).Day().At("05:45").Do(func() {
-		fmt.Println("Hello saya adalah tugas yang dijalankan setiap 05:45 di eksekusi")
-	})
+	fmt.Println("Host from godotenv : ", os.Getenv("DB_HOST"))
+	fmt.Println("Port from godotenv : ", os.Getenv("DB_PORT"))
 
-	s.Every(1).Day().At("00:00").Do(func() {
-		fmt.Println("Hello saya adalah tugas yang dijalankan setiap 00:00 di eksekusi")
-		// kode apa yang mau dieksekusi
-	})
+	viper.SetConfigType("yaml")
+	viper.SetConfigFile("config.yaml")
 
-	s.Every(1).Monday().At("07:00").Do(func() {
-		fmt.Println("Hello saya adalah tugas yang dijalankan setiap 07:00 di eksekusi")
-		// kode apa yang mau dieksekusi
-	})
+	err = viper.ReadInConfig()
 
-	s.StartBlocking()
+	if err != nil {
+		fmt.Println("Gagal load file env dari viper")
+	}
+
+	fmt.Println("Host from viper : ", viper.GetString("DB_HOST"))
+	fmt.Println("Port from viper : ", viper.GetInt("DB_PORT"))
 }
